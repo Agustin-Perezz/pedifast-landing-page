@@ -8,11 +8,49 @@
     Star
   } from '@lucide/svelte';
 
+  const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
+  const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+
+  const SubmitStatus = {
+    Idle: 'idle',
+    Loading: 'loading',
+    Success: 'success',
+    Error: 'error'
+  } as const;
+  type SubmitStatus = (typeof SubmitStatus)[keyof typeof SubmitStatus];
+
   let emailInput = $state<HTMLInputElement | null>(null);
+  let email = $state('');
+  let status = $state<SubmitStatus>(SubmitStatus.Idle);
 
   function focusEmailInput() {
     emailInput?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     emailInput?.focus();
+  }
+
+  async function submitEmail() {
+    if (!email || status === SubmitStatus.Loading) {
+      return;
+    }
+    status = SubmitStatus.Loading;
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/email_signups`, {
+        method: 'POST',
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          'Content-Type': 'application/json',
+          Prefer: 'return=minimal'
+        },
+        body: JSON.stringify({ email })
+      });
+      if (res.ok) {
+        status = SubmitStatus.Success;
+      } else {
+        status = SubmitStatus.Error;
+      }
+    } catch {
+      status = SubmitStatus.Error;
+    }
   }
 </script>
 
@@ -85,25 +123,48 @@
             />
           </p>
         </div>
-        <div
-          class="flex items-center overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-1.5 backdrop-blur-sm"
-        >
-          <input
-            bind:this={emailInput}
-            type="email"
-            placeholder="Tu email"
-            class="min-w-0 flex-1 bg-transparent px-4 py-2.5 text-base text-white placeholder-white/30 outline-none"
-          />
-          <button
-            class="gradient-btn flex shrink-0 items-center gap-2 rounded-xl px-5 py-2.5 text-base"
+        {#if status === SubmitStatus.Success}
+          <div
+            class="flex items-center gap-3 rounded-2xl border border-green-500/30 bg-green-500/10 px-5 py-4"
           >
-            Enviar
-            <ArrowRight size={16} />
-          </button>
-        </div>
-        <p class="text-sm text-white/30">
-          Sin tarjeta de crédito. Te avisamos cuando esté listo.
-        </p>
+            <span class="text-base font-medium text-green-400">
+              ¡Listo! Te avisamos cuando Pedifast esté disponible.
+            </span>
+          </div>
+        {:else}
+          <div
+            class="flex items-center overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-1.5 backdrop-blur-sm"
+          >
+            <input
+              bind:this={emailInput}
+              bind:value={email}
+              type="email"
+              placeholder="Tu email"
+              class="min-w-0 flex-1 bg-transparent px-4 py-2.5 text-base text-white placeholder-white/30 outline-none"
+              onkeydown={(e) => e.key === 'Enter' && submitEmail()}
+              disabled={status === SubmitStatus.Loading}
+            />
+            <button
+              onclick={submitEmail}
+              disabled={status === SubmitStatus.Loading}
+              class="gradient-btn flex shrink-0 items-center gap-2 rounded-xl px-5 py-2.5 text-base disabled:opacity-60"
+            >
+              {status === SubmitStatus.Loading ? 'Enviando…' : 'Enviar'}
+              {#if status !== SubmitStatus.Loading}
+                <ArrowRight size={16} />
+              {/if}
+            </button>
+          </div>
+          {#if status === SubmitStatus.Error}
+            <p class="text-sm text-red-400">
+              Algo salió mal. Intentá de nuevo.
+            </p>
+          {:else}
+            <p class="text-sm text-white/30">
+              Sin tarjeta de crédito. Te avisamos cuando esté listo.
+            </p>
+          {/if}
+        {/if}
       </div>
     </div>
 
