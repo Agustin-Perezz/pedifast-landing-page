@@ -1,6 +1,8 @@
 <script lang="ts">
   import { slide } from 'svelte/transition';
 
+  import LeadModal from '$lib/components/lead-modal.svelte';
+
   let activeDemo = $state<'whatsapp' | 'dashboard'>('whatsapp');
   let mobileMenuOpen = $state(false);
   let openFaq = $state<number | null>(null);
@@ -8,6 +10,8 @@
   let dashboardVideoEl = $state<HTMLVideoElement | null>(null);
   let dashboardUserVideoEl = $state<HTMLVideoElement | null>(null);
   let demoSectionEl = $state<HTMLElement | null>(null);
+  let leadModalOpen = $state(false);
+  let leadSource = $state('hero');
 
   $effect(() => {
     if (!demoSectionEl) return;
@@ -172,6 +176,10 @@
         </p>
         <div class="flex flex-col gap-3 sm:flex-row">
           <button
+            onclick={() => {
+              leadSource = 'hero';
+              leadModalOpen = true;
+            }}
             class="kinetic-gradient shadow-primary/25 cursor-pointer rounded-xl px-8 py-4 text-sm font-bold tracking-wide text-white shadow-lg transition-all duration-150 hover:opacity-90 active:scale-95"
           >
             Empezar Gratis
@@ -524,6 +532,10 @@
               </div>
             {/if}
             <button
+              onclick={() => {
+                leadSource = 'demo';
+                leadModalOpen = true;
+              }}
               class="kinetic-gradient w-full cursor-pointer rounded-xl py-3.5 text-xs font-bold tracking-widest text-white uppercase shadow-lg transition-all active:scale-95"
             >
               Prueba esta Funcionalidad
@@ -1126,6 +1138,10 @@
             </li>
           </ul>
           <button
+            onclick={() => {
+              leadSource = 'pricing';
+              leadModalOpen = true;
+            }}
             class="kinetic-gradient shadow-primary/30 w-full cursor-pointer rounded-xl py-3.5 text-xs font-bold tracking-widest text-white uppercase shadow-lg transition-all active:scale-95"
           >
             Empieza tu Prueba Gratis
@@ -1205,6 +1221,10 @@
         Pedifast.
       </p>
       <button
+        onclick={() => {
+          leadSource = 'final';
+          leadModalOpen = true;
+        }}
         class="kinetic-gradient shadow-primary/30 cursor-pointer rounded-xl px-10 py-5 text-base font-bold tracking-widest text-white uppercase shadow-2xl transition-all hover:opacity-90 active:scale-95"
       >
         Configurar mi local ahora
@@ -1212,6 +1232,8 @@
     </div>
   </section>
 </main>
+
+<LeadModal bind:open={leadModalOpen} source={leadSource} />
 
 <!-- Footer -->
 <footer class="border-outline-variant/30 border-t bg-white">
