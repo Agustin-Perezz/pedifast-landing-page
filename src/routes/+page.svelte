@@ -4,6 +4,34 @@
   let activeDemo = $state<'whatsapp' | 'dashboard'>('whatsapp');
   let mobileMenuOpen = $state(false);
   let openFaq = $state<number | null>(null);
+  let videoEl = $state<HTMLVideoElement | null>(null);
+  let dashboardVideoEl = $state<HTMLVideoElement | null>(null);
+  let dashboardUserVideoEl = $state<HTMLVideoElement | null>(null);
+  let demoSectionEl = $state<HTMLElement | null>(null);
+
+  $effect(() => {
+    if (!demoSectionEl) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const playing = entry.isIntersecting;
+        if (videoEl) {
+          if (playing) videoEl.play();
+          else videoEl.pause();
+        }
+        if (dashboardVideoEl) {
+          if (playing) dashboardVideoEl.play();
+          else dashboardVideoEl.pause();
+        }
+        if (dashboardUserVideoEl) {
+          if (playing) dashboardUserVideoEl.play();
+          else dashboardUserVideoEl.pause();
+        }
+      },
+      { threshold: 0.25 }
+    );
+    observer.observe(demoSectionEl);
+    return () => observer.disconnect();
+  });
 
   const faqs = [
     {
@@ -30,7 +58,7 @@
 </script>
 
 <svelte:head>
-  <title>Pedifast | Recupera el Control de tu Delivery</title>
+  <title>Pedifast | Recupera el Control de tus Pedidos</title>
 </svelte:head>
 
 <!-- Top Navigation -->
@@ -133,7 +161,7 @@
           class="font-headline text-on-surface mb-6 text-5xl leading-[1.08] font-extrabold tracking-tighter md:text-6xl lg:text-7xl"
         >
           Recupera el <span class="text-primary italic">Control</span><br />de
-          tu Delivery.
+          tus Pedidos.
         </h1>
         <p
           class="text-on-surface-variant mb-10 max-w-lg text-lg leading-relaxed"
@@ -159,6 +187,25 @@
             Demo
           </button>
         </div>
+        <div
+          class="mt-8 flex items-center justify-center gap-6 md:justify-start"
+        >
+          <span class="text-on-surface-variant text-md font-medium"
+            >Integra con</span
+          >
+          <div class="flex items-center gap-2">
+            <img
+              src="/Print_Inline_Green_CMYK_2026.svg"
+              alt="WhatsApp"
+              class="m-0 h-6 p-0"
+            />
+            <img
+              src="/MP_RGB_HANDSHAKE_color_horizontal.svg"
+              alt="MercadoPago"
+              class="h-12"
+            />
+          </div>
+        </div>
       </div>
 
       <div class="relative">
@@ -167,11 +214,11 @@
         >
           <img
             alt="Tablero de gestión de restaurante moderno"
-            class="h-[480px] w-full object-cover"
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDx8pkp0_uFTGedyRVagcG7JyTSo-oBZqoHkVpBxgTpbiDNhTtgjnOKr3QhnS6zkyOj1E_irIHcMgc-P9ck10Vy6hybpxdmFCBC6nlHfLrsI65W7gKEUYOunrtVHLfZCvPJtkxLMkwpDpQ8E8Ux-ywwjP_rlKNlyHY8vZE1N8zOS0RHLId3tEZvb_5l442WmKYObN5Wp1JlL_RRc2oB6dzWHNXJtcD6jX9tW7M2Bwn1GJ62Dr-kO5Fr34nNrci94tTpxkVbaptsfu0"
+            class="w-full object-contain"
+            src="/dashboard-screenshot.png"
           />
           <div
-            class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"
+            class="absolute inset-0 bg-linear-to-t from-black/40 to-transparent"
           ></div>
         </div>
         <!-- Floating Stat: Comisiones -->
@@ -180,7 +227,7 @@
         >
           <div class="flex items-center gap-3">
             <div
-              class="bg-tertiary-container flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl"
+              class="bg-tertiary-container flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
             >
               <span
                 class="material-symbols-outlined text-tertiary"
@@ -265,7 +312,7 @@
   </section>
 
   <!-- Demo Showcase Section -->
-  <section class="bg-surface py-24" id="demo">
+  <section class="bg-surface py-24" id="demo" bind:this={demoSectionEl}>
     <div class="mx-auto max-w-7xl px-6 md:px-8">
       <div class="mb-14 text-center">
         <h2
@@ -336,13 +383,13 @@
                       class="absolute inset-0 overflow-hidden rounded-[34px]"
                     >
                       <video
+                        bind:this={videoEl}
                         src="/pedifast-whatsapp-tier.mp4"
-                        autoplay
                         loop
                         muted
                         playsinline
                         onloadedmetadata={(e) =>
-                          (e.currentTarget.playbackRate = 1.5)}
+                          (e.currentTarget.playbackRate = 1.2)}
                         class="h-full w-full object-cover"
                       ></video>
                     </div>
@@ -364,25 +411,25 @@
                   ? 'opacity-100'
                   : 'pointer-events-none opacity-0'}"
               >
-                <img
-                  alt="Demo del dashboard de gestión"
-                  class="h-full w-full object-cover"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDp88VNpnxxYKXDNfHA6_0ryIrfATZfdaksaYX1oZAbK1ikuJcsb1r9Wp7lQL1iP7dcEtF9QVpFgRx8QGuqOfNrlrSD5EEeIhnbphx5q1R1v_o6pHGRgTR_zqieIf7I8nGhAhTKtmrB7FL4-WrTt_TsDGwU3-rgU0CuTbw8ZYUQgUOuUe9Kn2BrSY6OlaRdjA4Y4OpAx4x2Bt1wk9N35y7pDJsS3jy5gJYul1KkEvj7pwmlWYxkyjRVHxoyGNR0zx9ZMjATYGFc4jI"
-                />
-                <div
-                  class="absolute inset-0 flex cursor-pointer items-center justify-center bg-black/50 opacity-0 transition-opacity group-hover:opacity-100"
-                >
-                  <span
-                    class="material-symbols-outlined text-white"
-                    style="font-size:64px">play_circle</span
-                  >
+                <!-- Desktop dashboard video -->
+                <div class="relative h-full w-full overflow-hidden rounded-2xl">
+                  <video
+                    bind:this={dashboardVideoEl}
+                    src="/pedifast-dashboard-tier.mp4"
+                    loop
+                    muted
+                    playsinline
+                    onloadedmetadata={(e) =>
+                      (e.currentTarget.playbackRate = 1.2)}
+                    class="animate-zoom h-full w-full bg-neutral-900 object-contain"
+                  ></video>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Description -->
-          <div class="space-y-6 lg:col-span-4">
+          <div class="w-full space-y-6 lg:col-span-4">
             {#if activeDemo === 'whatsapp'}
               <div>
                 <h4
@@ -436,9 +483,9 @@
                   Gestión Centralizada
                 </h4>
                 <p class="text-on-surface-variant mb-6 leading-relaxed">
-                  Para operativas de alto volumen. Visualizá todos los pedidos
-                  en tiempo real, gestioná estados de cocina y repartí con
-                  logística propia o integrada.
+                  Para operativas de medio/alto volumen. Visualizá todos los
+                  pedidos en tiempo real, gestioná estados de cocina y repartí
+                  con logística propia o integrada.
                 </p>
                 <ul class="space-y-3">
                   <li class="text-on-surface flex items-center gap-3 text-sm">
@@ -455,7 +502,15 @@
                       style="font-variation-settings: 'FILL' 1;"
                       >check_circle</span
                     >
-                    Reportes de ventas y productos
+                    Reportes de ventas y productos en vivo
+                  </li>
+                  <li class="text-on-surface flex items-center gap-3 text-sm">
+                    <span
+                      class="material-symbols-outlined text-tertiary text-lg"
+                      style="font-variation-settings: 'FILL' 1;"
+                      >check_circle</span
+                    >
+                    Impresión automática de comandas por columna
                   </li>
                   <li class="text-on-surface flex items-center gap-3 text-sm">
                     <span
@@ -784,7 +839,7 @@
           Lo que dicen los que cocinan
         </h2>
         <p class="text-on-surface-variant">
-          Restaurantes que ya recuperaron el control de su delivery.
+          Restaurantes que ya recuperaron el control de sus pedidos.
         </p>
       </div>
       <div class="grid items-start gap-6 md:grid-cols-3">
@@ -979,7 +1034,7 @@
             </p>
           </div>
           <div class="mb-8">
-            <span class="text-on-surface text-5xl font-extrabold">$2.900</span>
+            <span class="text-on-surface text-5xl font-extrabold">$10.000</span>
             <span class="text-on-surface-variant ml-1">/mes</span>
           </div>
           <ul class="mb-10 flex-grow space-y-4">
@@ -1035,7 +1090,7 @@
             </p>
           </div>
           <div class="mb-8">
-            <span class="text-5xl font-extrabold text-white">$5.500</span>
+            <span class="text-5xl font-extrabold text-white">$12.999</span>
             <span class="ml-1 text-stone-400">/mes</span>
           </div>
           <ul class="mb-10 flex-grow space-y-4">
