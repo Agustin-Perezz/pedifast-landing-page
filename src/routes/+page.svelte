@@ -86,10 +86,17 @@
         href="#pricing">Planes</a
       >
       <a
-        class="text-on-surface-variant hover:text-on-surface transition-colors duration-200"
-        href="#">Ingresar</a
+        class="text-on-surface-variant hover:text-on-surface cursor-pointer transition-colors duration-200"
+        onclick={() => {
+          leadSource = 'nav';
+          leadModalOpen = true;
+        }}>Ingresar</a
       >
       <button
+        onclick={() => {
+          leadSource = 'hero';
+          leadModalOpen = true;
+        }}
         class="kinetic-gradient cursor-pointer rounded-lg px-5 py-2 font-semibold text-white transition-all duration-150 hover:opacity-90 active:scale-95"
       >
         Empezar Gratis
@@ -125,11 +132,19 @@
         onclick={() => (mobileMenuOpen = false)}>Planes</a
       >
       <a
-        class="text-on-surface-variant hover:text-on-surface rounded-lg px-2 py-3 font-medium transition-colors"
-        href="#"
-        onclick={() => (mobileMenuOpen = false)}>Ingresar</a
+        class="text-on-surface-variant hover:text-on-surface cursor-pointer rounded-lg px-2 py-3 font-medium transition-colors"
+        onclick={() => {
+          leadSource = 'nav';
+          leadModalOpen = true;
+          mobileMenuOpen = false;
+        }}>Ingresar</a
       >
       <button
+        onclick={() => {
+          leadSource = 'hero';
+          leadModalOpen = true;
+          mobileMenuOpen = false;
+        }}
         class="kinetic-gradient mt-2 w-full cursor-pointer rounded-xl py-3 font-semibold text-white"
       >
         Empezar Gratis
